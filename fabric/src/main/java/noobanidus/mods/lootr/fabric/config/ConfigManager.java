@@ -382,6 +382,7 @@ public class ConfigManager implements ConfigData {
     public boolean blast_resistant = false;
     public boolean blast_immune = false;
     public boolean trapped_custom = false;
+    public boolean should_drop_player_loot = false;
   }
 
   public static class Lists {

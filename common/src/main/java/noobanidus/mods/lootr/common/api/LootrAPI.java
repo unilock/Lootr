@@ -310,6 +310,9 @@ public class LootrAPI {
     return INSTANCE.isFakePlayerBreakEnabled();
   }
 
+  public static boolean shouldDropPlayerLoot () {
+    return INSTANCE.shouldDropPlayerLoot();
+  }
 
   public static boolean shouldPerformDecayWhileTicking() {
     return INSTANCE.shouldPerformDecayWhileTicking();
@@ -424,5 +427,9 @@ public class LootrAPI {
 
   public static boolean isTaggedStructurePresent (ServerLevel level, ChunkPos chunkPos, TagKey<Structure> tag, BlockPos pos) {
     return INSTANCE.isTaggedStructurePresent(level, chunkPos, tag, pos);
+  }
+
+  public static void playerDestroyed (Level level, Player player, BlockPos blockPos, @Nullable BlockEntity blockEntity) {
+    INSTANCE.playerDestroyed(level, player, blockPos, blockEntity);
   }
 }

@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -143,5 +144,11 @@ public class LootrInventoryBlock extends ChestBlock {
     if (blockentity instanceof LootrInventoryBlockEntity inventory) {
       inventory.recheckOpen();
     }
+  }
+
+  @Override
+  public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
+    super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
+    LootrAPI.playerDestroyed(level, player, blockPos, blockEntity);
   }
 }

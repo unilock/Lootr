@@ -202,6 +202,8 @@ public interface ILootrAPI {
 
   boolean isFakePlayerBreakEnabled();
 
+  boolean shouldDropPlayerLoot();
+
   boolean shouldPerformDecayWhileTicking ();
   boolean shouldPerformRefreshWhileTicking ();
   boolean shouldStartDecayWhileTicking ();
@@ -253,6 +255,8 @@ public interface ILootrAPI {
   <T extends Entity> ILootrCart resolveEntity (T entity);
 
   boolean isTaggedStructurePresent (ServerLevel level, ChunkPos chunkPos, TagKey<Structure> tag, BlockPos pos);
+
+  void playerDestroyed (Level level, Player player, BlockPos pos, @Nullable BlockEntity blockEntity);
 }
 
 

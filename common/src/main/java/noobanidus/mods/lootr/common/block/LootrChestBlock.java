@@ -8,6 +8,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -96,8 +97,8 @@ public class LootrChestBlock extends ChestBlock {
   }
 
   @Override
-  public float getDestroyProgress(BlockState p_60466_, Player p_60467_, BlockGetter p_60468_, BlockPos p_60469_) {
-    return LootrAPI.getDestroyProgress(p_60466_, p_60467_, p_60468_, p_60469_, super.getDestroyProgress(p_60466_, p_60467_, p_60468_, p_60469_));
+  public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
+    return LootrAPI.getDestroyProgress(pState, pPlayer, pLevel, pPos, super.getDestroyProgress(pState, pPlayer, pLevel, pPos));
   }
 
   @Override
@@ -117,5 +118,11 @@ public class LootrChestBlock extends ChestBlock {
     if (blockentity instanceof LootrChestBlockEntity chest) {
       chest.recheckOpen();
     }
+  }
+
+  @Override
+  public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
+    super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
+    LootrAPI.playerDestroyed(level, player, blockPos, blockEntity);
   }
 }

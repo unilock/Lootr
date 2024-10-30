@@ -73,6 +73,7 @@ public class ConfigManager {
   public static final ModConfigSpec.BooleanValue POWER_COMPARATORS;
   public static final ModConfigSpec.BooleanValue BLAST_RESISTANT;
   public static final ModConfigSpec.BooleanValue BLAST_IMMUNE;
+  public static final ModConfigSpec.BooleanValue SHOULD_DROP_PLAYER_LOOT;
   public static final ModConfigSpec.IntValue NOTIFICATION_DELAY;
   public static final ModConfigSpec.BooleanValue DISABLE_NOTIFICATIONS;
   public static final ModConfigSpec.BooleanValue DISABLE_MESSAGE_STYLES;
@@ -131,6 +132,7 @@ public class ConfigManager {
     ENABLE_FAKE_PLAYER_BREAK = COMMON_BUILDER.comment("allows fake players to destroy Lootr chests without having to sneak, overrides the `disable_break` option for fake players").define("enable_fake_player_break", false);
     BLAST_RESISTANT = COMMON_BUILDER.comment("lootr chests cannot be destroyed by creeper or TNT explosions").define("blast_resistant", false);
     BLAST_IMMUNE = COMMON_BUILDER.comment("lootr chests cannot be destroyed by any explosion").define("blast_immune", false);
+    SHOULD_DROP_PLAYER_LOOT = COMMON_BUILDER.comment("lootr chests will drop the contents of the player-specific inventory (generated when not generated) when broken").define("should_drop_player_loot", false);
     COMMON_BUILDER.pop();
     COMMON_BUILDER.push("power").comment("configuration options for comparators and redstone power");
     POWER_COMPARATORS = COMMON_BUILDER.comment("when true, comparators on Lootr containers will give an output of 1; when false, they will give an output of 0").define("power_comparators", true);

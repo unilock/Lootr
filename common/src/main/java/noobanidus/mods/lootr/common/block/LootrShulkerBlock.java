@@ -144,4 +144,10 @@ public class LootrShulkerBlock extends ShulkerBoxBlock {
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
     return ILootrBlockEntity::ticker;
   }
+
+  @Override
+  public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
+    super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
+    LootrAPI.playerDestroyed(level, player, blockPos, blockEntity);
+  }
 }

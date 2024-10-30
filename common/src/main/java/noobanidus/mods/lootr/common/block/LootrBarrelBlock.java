@@ -4,9 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
@@ -16,8 +17,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import noobanidus.mods.lootr.common.api.LootrAPI;
+import noobanidus.mods.lootr.common.api.data.DefaultLootFiller;
 import noobanidus.mods.lootr.common.api.data.ILootrInfoProvider;
 import noobanidus.mods.lootr.common.api.data.blockentity.ILootrBlockEntity;
+import noobanidus.mods.lootr.common.api.data.inventory.ILootrInventory;
 import noobanidus.mods.lootr.common.block.entity.LootrBarrelBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +38,7 @@ public abstract class LootrBarrelBlock extends BarrelBlock {
   public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
     if (!pState.is(pNewState.getBlock())) {
       BlockEntity blockentity = pLevel.getBlockEntity(pPos);
-      if (blockentity instanceof Container) {
+      if (blockentity instanceof LootrBarrelBlockEntity) {
         pLevel.updateNeighbourForOutputSignal(pPos, this);
       }
 
@@ -90,12 +93,18 @@ public abstract class LootrBarrelBlock extends BarrelBlock {
   }
 
   @Override
-  public float getDestroyProgress(BlockState p_60466_, Player p_60467_, BlockGetter p_60468_, BlockPos p_60469_) {
-    return LootrAPI.getDestroyProgress(p_60466_, p_60467_, p_60468_, p_60469_, super.getDestroyProgress(p_60466_, p_60467_, p_60468_, p_60469_));
+  public float getDestroyProgress(BlockState pBlockState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
+    return LootrAPI.getDestroyProgress(pBlockState, pPlayer, pLevel, pPos, super.getDestroyProgress(pBlockState, pPlayer, pLevel, pPos));
   }
 
   @Override
   public int getAnalogOutputSignal(BlockState pBlockState, Level pLevel, BlockPos pPos) {
     return LootrAPI.getAnalogOutputSignal(pBlockState, pLevel, pPos, 0);
+  }
+
+  @Override
+  public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
+    super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
+    LootrAPI.playerDestroyed(level, player, blockPos, blockEntity);
   }
 }

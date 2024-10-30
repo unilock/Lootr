@@ -338,6 +338,11 @@ public class LootrAPIImpl extends DefaultLootrAPIImpl {
   }
 
   @Override
+  public boolean shouldDropPlayerLoot() {
+    return ConfigManager.SHOULD_DROP_PLAYER_LOOT.get();
+  }
+
+  @Override
   public boolean shouldPerformDecayWhileTicking () {
     return ConfigManager.PERFORM_DECAY_WHILE_TICKING.get();
   }

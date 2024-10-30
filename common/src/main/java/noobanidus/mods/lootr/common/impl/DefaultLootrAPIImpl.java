@@ -8,9 +8,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
@@ -324,5 +326,19 @@ public abstract class DefaultLootrAPIImpl implements ILootrAPI {
       return true;
     }
     return level.getWorldBorder().isWithinBounds(pos);
+  }
+
+  @Override
+  public void playerDestroyed(Level level, Player player, BlockPos pos, @Nullable BlockEntity blockEntity) {
+    if (!shouldDropPlayerLoot() ||(level.isClientSide() || blockEntity == null)) {
+      return;
+    }
+
+    if (LootrAPI.resolveBlockEntity(blockEntity) instanceof ILootrInfoProvider provider && player instanceof ServerPlayer serverPlayer) {
+      ILootrInventory inventory = getInventory(provider, serverPlayer, DefaultLootFiller.getInstance());
+      if (inventory != null) {
+        Containers.dropContents(level, pos, inventory);
+      }
+    }
   }
 }
