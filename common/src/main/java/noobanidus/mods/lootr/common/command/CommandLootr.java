@@ -11,6 +11,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,10 +24,12 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
@@ -36,6 +39,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
@@ -54,6 +60,7 @@ import noobanidus.mods.lootr.common.mixins.MixinBaseContainerBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandLootr {
   private static List<ResourceKey<LootTable>> tables = null;
@@ -247,6 +254,7 @@ public class CommandLootr {
         } else {
           inventory.setCustomInventory(custom);
           inventory.setChanged();
+
         }
       }
       return 1;
@@ -408,6 +416,51 @@ public class CommandLootr {
       }
       return 1;
     })));
+    builder.then(Commands.literal("convert").then(Commands.argument("from", BlockPosArgument.blockPos()).then(Commands.argument("to", BlockPosArgument.blockPos()).executes(context -> {
+      BoundingBox bounds = BoundingBox.fromCorners(BlockPosArgument.getLoadedBlockPos(context, "from"), BlockPosArgument.getLoadedBlockPos(context, "to"));
+      ChunkPos start = new ChunkPos(new BlockPos(bounds.minX(), bounds.minY(), bounds.minZ()));
+      ChunkPos stop = new ChunkPos(new BlockPos(bounds.maxX(), bounds.maxY(), bounds.maxZ()));
+      List<ChunkPos> positions = new ArrayList<>();
+      for (int x = start.x; x <= stop.x; x++) {
+        for (int z = start.z; z <= stop.z; z++) {
+          positions.add(new ChunkPos(x, z));
+        }
+      }
+      ServerLevel level = context.getSource().getLevel();
+      for (ChunkPos chunkPos : positions) {
+        LevelChunk chunk = level.getChunk(chunkPos.x, chunkPos.z);
+        List<BlockPos> convertableBlocks = new ArrayList<>();
+        for (BlockPos pos : chunk.getBlockEntitiesPos()) {
+          if (!bounds.isInside(pos)) {
+            continue;
+          }
+          convertableBlocks.add(pos);
+        }
+        if (convertableBlocks.isEmpty()) {
+          continue;
+        }
+        for (BlockPos pos : convertableBlocks) {
+          BlockEntity blockEntity = chunk.getBlockEntity(pos, LevelChunk.EntityCreationType.IMMEDIATE);
+          BlockState state = blockEntity.getBlockState();
+          if (state.is(Blocks.BARREL) || state.is(Blocks.CHEST)) {
+            NonNullList<ItemStack> reference = ((MixinBaseContainerBlockEntity) blockEntity).invokeGetItems();
+            BlockState newState = state.is(Blocks.CHEST) ? LootrRegistry.getInventoryBlock().defaultBlockState().setValue(ChestBlock.FACING, state.getValue(ChestBlock.FACING)).setValue(ChestBlock.WATERLOGGED, state.getValue(ChestBlock.WATERLOGGED)) : LootrRegistry.getInventoryBlock().defaultBlockState().setValue(BarrelBlock.FACING, state.getValue(BarrelBlock.FACING));
+            NonNullList<ItemStack> custom = copyItemList(reference);
+            level.removeBlockEntity(pos);
+            level.setBlockAndUpdate(pos, newState);
+            BlockEntity te = level.getBlockEntity(pos);
+            if (!(te instanceof LootrInventoryBlockEntity inventory)) {
+              context.getSource().sendSuccess(() -> Component.literal("Unable to convert chest, BlockState is not a Lootr Inventory block."), false);
+            } else {
+              inventory.setCustomInventory(custom);
+              inventory.setChanged();
+            }
+          }
+        }
+      }
+
+      return 1;
+    }))));
     return builder;
   }
 }
