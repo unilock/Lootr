@@ -16,6 +16,7 @@ import noobanidus.mods.lootr.fabric.client.block.LootrShulkerBlockRenderer;
 import noobanidus.mods.lootr.fabric.client.entity.LootrChestCartRenderer;
 import noobanidus.mods.lootr.fabric.client.item.LootrChestItemRenderer;
 import noobanidus.mods.lootr.fabric.client.item.LootrShulkerItemRenderer;
+import noobanidus.mods.lootr.fabric.client.item.LootrTrappedChestItemRenderer;
 import noobanidus.mods.lootr.fabric.init.ModBlockEntities;
 import noobanidus.mods.lootr.fabric.init.ModBlocks;
 import noobanidus.mods.lootr.fabric.init.ModEntities;
@@ -33,7 +34,7 @@ public class LootrClient implements ClientModInitializer {
     BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.CHEST, LootrChestItemRenderer.getInstance());
 
     BlockEntityRenderers.register(ModBlockEntities.LOOTR_TRAPPED_CHEST, LootrChestBlockRenderer::new);
-    BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.TRAPPED_CHEST, LootrChestItemRenderer.getInstance());
+    BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.TRAPPED_CHEST, LootrTrappedChestItemRenderer.getInstance());
 
     BlockEntityRenderers.register(ModBlockEntities.LOOTR_INVENTORY, LootrChestBlockRenderer::new);
     BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.INVENTORY, LootrChestItemRenderer.getInstance());
