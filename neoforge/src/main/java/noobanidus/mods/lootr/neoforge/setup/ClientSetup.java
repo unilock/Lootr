@@ -14,11 +14,13 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import noobanidus.mods.lootr.common.api.LootrAPI;
 import noobanidus.mods.lootr.common.api.registry.LootrRegistry;
 import noobanidus.mods.lootr.common.block.entity.LootrChestBlockEntity;
+import noobanidus.mods.lootr.common.block.entity.LootrInventoryBlockEntity;
 import noobanidus.mods.lootr.common.block.entity.LootrShulkerBlockEntity;
 import noobanidus.mods.lootr.common.block.entity.LootrTrappedChestBlockEntity;
 import noobanidus.mods.lootr.common.client.entity.LootrChestCartRenderer;
 import noobanidus.mods.lootr.common.client.item.LootrChestItemRenderer;
 import noobanidus.mods.lootr.common.client.item.LootrShulkerItemRenderer;
+import noobanidus.mods.lootr.common.client.item.LootrTrappedChestItemRenderer;
 import noobanidus.mods.lootr.common.entity.LootrChestMinecartEntity;
 import noobanidus.mods.lootr.neoforge.client.block.BarrelModel;
 import noobanidus.mods.lootr.neoforge.client.block.LootrChestBlockRenderer;
@@ -39,23 +41,31 @@ public class ClientSetup {
     event.registerBlockEntityRenderer((BlockEntityType<LootrTrappedChestBlockEntity>) LootrRegistry.getTrappedChestBlockEntity(), LootrChestBlockRenderer::new);
     event.registerBlockEntityRenderer((BlockEntityType<LootrChestBlockEntity>) LootrRegistry.getChestBlockEntity(), LootrChestBlockRenderer::new);
     event.registerBlockEntityRenderer((BlockEntityType<LootrShulkerBlockEntity>) LootrRegistry.getShulkerBlockEntity(), LootrShulkerBlockRenderer::new);
+    event.registerBlockEntityRenderer((BlockEntityType<LootrInventoryBlockEntity>) LootrRegistry.getInventoryBlockEntity(), LootrChestBlockRenderer::new);
     event.registerEntityRenderer((EntityType<LootrChestMinecartEntity>) LootrRegistry.getMinecart(), (e) -> new LootrChestCartRenderer<>(e, ModelLayers.CHEST_MINECART));
   }
 
   @SubscribeEvent
-  public static void registerClientExtensions (RegisterClientExtensionsEvent event) {
-    event.registerItem(new IClientItemExtensions() {
+  public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+    IClientItemExtensions chest = new IClientItemExtensions() {
       @Override
       public BlockEntityWithoutLevelRenderer getCustomRenderer() {
         return LootrChestItemRenderer.getInstance();
       }
-    }, LootrRegistry.getChestItem());
+    };
     event.registerItem(new IClientItemExtensions() {
       @Override
       public BlockEntityWithoutLevelRenderer getCustomRenderer() {
         return LootrShulkerItemRenderer.getInstance();
       }
     }, LootrRegistry.getShulkerItem());
+    event.registerItem(new IClientItemExtensions() {
+      @Override
+      public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+        return LootrTrappedChestItemRenderer.getInstance();
+      }
+    }, LootrRegistry.getTrappedChestItem());
+    event.registerItem(chest, LootrRegistry.getChestItem());
+    event.registerItem(chest, LootrRegistry.getInventoryItem());
   }
-
 }
