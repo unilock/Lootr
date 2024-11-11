@@ -203,7 +203,7 @@ public class LootrSavedData extends SavedData implements ILootrSavedData {
 
   @Override
   public void update(ILootrInfo info) {
-    if (shouldUpdate()) {
+    if (shouldUpdate() || info.getInfoPos() != getInfoPos() || info.getInfoDimension() != getInfoDimension()) {
       markChanged();
       this.info = info;
       justLoaded = false;
