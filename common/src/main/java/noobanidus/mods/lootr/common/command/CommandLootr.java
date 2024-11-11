@@ -38,13 +38,13 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
 import noobanidus.mods.lootr.common.api.LootrAPI;
+import noobanidus.mods.lootr.common.api.LootrTags;
 import noobanidus.mods.lootr.common.api.data.blockentity.ILootrBlockEntity;
 import noobanidus.mods.lootr.common.api.registry.LootrRegistry;
 import noobanidus.mods.lootr.common.block.LootrBarrelBlock;
@@ -59,7 +59,6 @@ import noobanidus.mods.lootr.common.mixins.MixinBaseContainerBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CommandLootr {
   private static List<ResourceKey<LootTable>> tables = null;
@@ -222,32 +221,25 @@ public class CommandLootr {
     })));
     builder.then(Commands.literal("custom").executes(c -> {
       BlockPos pos = BlockPos.containing(c.getSource().getPosition());
-      Level world = c.getSource().getLevel();
-      BlockState state = world.getBlockState(pos);
-      if (!state.is(Blocks.CHEST) && !state.is(Blocks.BARREL)) {
+      Level level = c.getSource().getLevel();
+      BlockState state = level.getBlockState(pos);
+      if (!state.is(LootrTags.Blocks.CUSTOM_ELIGIBLE)) {
         pos = pos.below();
-        state = world.getBlockState(pos);
+        state = level.getBlockState(pos);
       }
-      if (!state.is(Blocks.CHEST) && !state.is(Blocks.BARREL)) {
-        c.getSource().sendSuccess(() -> Component.literal("Please stand on the chest or barrel you wish to convert."), false);
+      if (!state.is(LootrTags.Blocks.CUSTOM_ELIGIBLE)) {
+        c.getSource().sendSuccess(() -> Component.literal("Please stand on the container you wish to convert."), false);
       } else {
-        NonNullList<ItemStack> reference;
-        BlockState newState;
-        if (state.is(Blocks.CHEST)) {
-          reference = ((MixinBaseContainerBlockEntity) Objects.requireNonNull(world.getBlockEntity(pos))).invokeGetItems();
-          newState = LootrRegistry.getInventoryBlock().defaultBlockState().setValue(ChestBlock.FACING, state.getValue(ChestBlock.FACING)).setValue(ChestBlock.WATERLOGGED, state.getValue(ChestBlock.WATERLOGGED));
-        } else {
-          Direction facing = state.getValue(BarrelBlock.FACING);
-          if (facing == Direction.UP || facing == Direction.DOWN) {
-            facing = Direction.NORTH;
-          }
-          reference = ((MixinBaseContainerBlockEntity) Objects.requireNonNull(world.getBlockEntity(pos))).invokeGetItems();
-          newState = LootrRegistry.getInventoryBlock().defaultBlockState().setValue(ChestBlock.FACING, facing);
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (!(blockEntity instanceof BaseContainerBlockEntity container)) {
+          c.getSource().sendSuccess(() -> Component.literal("Please stand on the container you wish to convert."), false);
         }
+        NonNullList<ItemStack> reference = ((MixinBaseContainerBlockEntity) blockEntity).invokeGetItems();
+        BlockState newState = updateBlockState(state, LootrRegistry.getInventoryBlock().defaultBlockState());
         NonNullList<ItemStack> custom = copyItemList(reference);
-        world.removeBlockEntity(pos);
-        world.setBlockAndUpdate(pos, newState);
-        BlockEntity te = world.getBlockEntity(pos);
+        level.removeBlockEntity(pos);
+        level.setBlockAndUpdate(pos, newState);
+        BlockEntity te = level.getBlockEntity(pos);
         if (!(te instanceof LootrInventoryBlockEntity inventory)) {
           c.getSource().sendSuccess(() -> Component.literal("Unable to convert chest, BlockState is not a Lootr Inventory block."), false);
         } else {
@@ -449,7 +441,7 @@ public class CommandLootr {
             }
           }
           BlockState state = blockEntity.getBlockState();
-          if (state.is(Blocks.BARREL) || state.is(Blocks.CHEST)) {
+          if (!state.is(LootrTags.Blocks.CUSTOM_ELIGIBLE) && !blockEntity.getType().builtInRegistryHolder().is(LootrTags.BlockEntity.CUSTOM_INELIGIBlE)) {
             NonNullList<ItemStack> reference = ((MixinBaseContainerBlockEntity) blockEntity).invokeGetItems();
             BlockState newState = updateBlockState(state, LootrRegistry.getInventoryBlock().defaultBlockState());
             NonNullList<ItemStack> custom = copyItemList(reference);
