@@ -31,13 +31,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BarrelBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -441,10 +440,18 @@ public class CommandLootr {
         }
         for (BlockPos pos : convertableBlocks) {
           BlockEntity blockEntity = chunk.getBlockEntity(pos, LevelChunk.EntityCreationType.IMMEDIATE);
+          if (!(blockEntity instanceof BaseContainerBlockEntity)) {
+            continue;
+          }
+          if (blockEntity instanceof RandomizableContainerBlockEntity lootContainer) {
+            if (lootContainer.getLootTable() != null) {
+              continue;
+            }
+          }
           BlockState state = blockEntity.getBlockState();
           if (state.is(Blocks.BARREL) || state.is(Blocks.CHEST)) {
             NonNullList<ItemStack> reference = ((MixinBaseContainerBlockEntity) blockEntity).invokeGetItems();
-            BlockState newState = state.is(Blocks.CHEST) ? LootrRegistry.getInventoryBlock().defaultBlockState().setValue(ChestBlock.FACING, state.getValue(ChestBlock.FACING)).setValue(ChestBlock.WATERLOGGED, state.getValue(ChestBlock.WATERLOGGED)) : LootrRegistry.getInventoryBlock().defaultBlockState().setValue(BarrelBlock.FACING, state.getValue(BarrelBlock.FACING));
+            BlockState newState = updateBlockState(state, LootrRegistry.getInventoryBlock().defaultBlockState());
             NonNullList<ItemStack> custom = copyItemList(reference);
             level.removeBlockEntity(pos);
             level.setBlockAndUpdate(pos, newState);
@@ -462,6 +469,19 @@ public class CommandLootr {
       return 1;
     }))));
     return builder;
+  }
+
+  private static BlockState updateBlockState (BlockState oldState, BlockState newState) {
+    if (oldState.hasProperty(BlockStateProperties.FACING) && newState.hasProperty(BlockStateProperties.FACING)) {
+      newState = newState.setValue(BlockStateProperties.FACING, oldState.getValue(BlockStateProperties.FACING));
+    }
+    if (oldState.hasProperty(HorizontalDirectionalBlock.FACING) && newState.hasProperty(HorizontalDirectionalBlock.FACING)) {
+      newState = newState.setValue(HorizontalDirectionalBlock.FACING, oldState.getValue(HorizontalDirectionalBlock.FACING));
+    }
+    if (oldState.hasProperty(BlockStateProperties.WATERLOGGED) && newState.hasProperty(BlockStateProperties.WATERLOGGED)) {
+      newState = newState.setValue(BlockStateProperties.WATERLOGGED, oldState.getValue(BlockStateProperties.WATERLOGGED));
+    }
+    return newState;
   }
 }
 

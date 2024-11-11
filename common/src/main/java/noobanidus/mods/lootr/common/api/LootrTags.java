@@ -23,6 +23,8 @@ public class LootrTags {
     public static final TagKey<Block> BARRELS = tag("barrels");
     public static final TagKey<Block> CONTAINERS = tag("containers");
 
+    public static final TagKey<Block> CUSTOM_ELIGIBLE = tag("convert/custom_eligible");
+
     public static final TagKey<Block> CATS_CAN_BLOCK = tag("cats_can_block");
 
     static TagKey<Block> tag(String name) {
@@ -56,6 +58,7 @@ public class LootrTags {
   public static class BlockEntity extends LootrTags {
     public static TagKey<BlockEntityType<?>> LOOTR_OBJECT = tag("object");
     public static TagKey<BlockEntityType<?>> TRAPPED = tag("trapped");
+    public static TagKey<BlockEntityType<?>> CUSTOM_INELIGIBlE = tag("custom_ineligible");
 
     public static boolean isTagged(net.minecraft.world.level.block.entity.BlockEntity blockEntity, TagKey<BlockEntityType<?>> tag) {
       return blockEntity.getType().builtInRegistryHolder().is(tag);

@@ -44,6 +44,8 @@ public class LootrBlockTagProvider extends BlockTagsProvider {
     tag(LootrTags.Blocks.CONVERT_BLOCK).addTags(LootrTags.Blocks.CONVERT_BARRELS, LootrTags.Blocks.CONVERT_CHESTS, LootrTags.Blocks.CONVERT_TRAPPED_CHESTS, LootrTags.Blocks.CONVERT_SHULKERS);
 
     tag(LootrTags.Blocks.CONVERT_BLACKLIST);
+
+    tag(LootrTags.Blocks.CUSTOM_ELIGIBLE).add(Blocks.BARREL, Blocks.CHEST);
   }
 
   @Override
