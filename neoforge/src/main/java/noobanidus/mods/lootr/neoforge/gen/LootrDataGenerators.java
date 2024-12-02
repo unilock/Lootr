@@ -5,10 +5,12 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.data.AdvancementProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import noobanidus.mods.lootr.common.api.LootrAPI;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @EventBusSubscriber(modid = LootrAPI.MODID, bus = EventBusSubscriber.Bus.MOD)
@@ -28,5 +30,7 @@ public class LootrDataGenerators {
     generator.addProvider(event.includeServer(), new LootrEntityTagsProvider(output, provider, helper));
     generator.addProvider(event.includeServer(), new LootrBlockEntityTagsProvider(output, provider, helper));
     generator.addProvider(event.includeServer(), new LootrStructureTagsProvider(output, provider, helper));
+    generator.addProvider(event.includeClient(), new LootrLangProvider(output));
+    generator.addProvider(event.includeServer(), new AdvancementProvider(output, provider, helper, List.of(new LootrAdvancementGenerator())));
   }
 }

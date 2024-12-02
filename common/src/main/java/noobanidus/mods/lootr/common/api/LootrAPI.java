@@ -45,6 +45,7 @@ public class LootrAPI {
   public static final String MODID = "lootr";
   public static final String NETWORK_VERSION = "lootr-1.21.0-1";
   public static final ResourceKey<LootTable> ELYTRA_CHEST = ResourceKey.create(Registries.LOOT_TABLE, LootrAPI.rl("chests/elytra"));
+  public static final ResourceKey<LootTable> TROPHY_REWARD = ResourceKey.create(Registries.LOOT_TABLE, LootrAPI.rl("reward/trophy"));
   public static final TicketType<Unit> LOOTR_ENTITY_TICK_TICKET = TicketType.create("lootr_entity_tick_ticket", (unit1, unit2) -> 0, 300);
   public static final TicketType<ChunkPos> LOOTR_CHUNK_CONVERT_TICKET = TicketType.create("lootr_chunk_convert_ticket", Comparator.comparingLong(ChunkPos::toLong),1500);
 
