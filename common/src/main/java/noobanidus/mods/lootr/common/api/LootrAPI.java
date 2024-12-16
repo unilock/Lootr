@@ -435,4 +435,8 @@ public class LootrAPI {
   public static void playerDestroyed (Level level, Player player, BlockPos blockPos, @Nullable BlockEntity blockEntity) {
     INSTANCE.playerDestroyed(level, player, blockPos, blockEntity);
   }
+
+  public static void refreshSections () {
+    INSTANCE.refreshSections();
+  }
 }
