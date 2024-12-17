@@ -234,11 +234,6 @@ public class LootrChestBlockEntity extends ChestBlockEntity implements ILootrBlo
   }
 
   @Override
-  public void manuallySetLootTable(ResourceKey<LootTable> table, long seed) {
-    setLootTable(table, seed);
-  }
-
-  @Override
   public void markChanged() {
     setChanged();
     markDataChanged();
