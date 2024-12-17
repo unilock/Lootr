@@ -56,14 +56,6 @@ public class AdvancementData extends SavedData {
     return pCompound;
   }
 
-  @Override
-  public void save(File pFile, HolderLookup.Provider provider) {
-    if (isDirty()) {
-      pFile.getParentFile().mkdirs();
-    }
-    super.save(pFile, provider);
-  }
-
   public static class UUIDPair {
     @NotNull
     private UUID first;
