@@ -23,7 +23,6 @@ import noobanidus.mods.lootr.neoforge.network.PacketHandler;
 // - or use toasts
 // - bring back decay/refresh structures
 // - lockouts?
-// - dropping loot when breaking chests
 @Mod(value=LootrAPI.MODID)
 public class Lootr {
   public static Lootr instance;
